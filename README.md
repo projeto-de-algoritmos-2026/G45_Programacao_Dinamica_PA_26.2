@@ -59,7 +59,9 @@ M[j] = max( valor(j) + M[p(j)],   pega a tarefa j
             M[j-1] )              pula a tarefa j
 ```
 
-O valor máximo é `M[n]`. A ordenação e as buscas binárias custam O(n log n); a PD em si é O(n). Há também uma versão recursiva com memoização (`calcularTabelaMemo`), só para comparação.
+4. Reconstrói a agenda lendo `M` de trás para frente, sem recalcular a PD: a partir de `j = n`, se `valor(j) + M[p(j)] >= M[j-1]`, a tarefa `j` entra e o próximo é `p(j)`; senão, passa para `j - 1`. As escolhidas saem em ordem cronológica.
+
+O valor máximo é `M[n]`. A ordenação e as buscas binárias custam O(n log n); a PD e a reconstrução são O(n). Há também uma versão recursiva com memoização (`calcularTabelaMemo`), só para comparação.
 
 ## Formato das tarefas
 
