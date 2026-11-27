@@ -47,6 +47,20 @@ tests/                testes automatizados (node --test)
 scripts/servidor.js   servidor local para o `npm start`
 ```
 
+## Algoritmo
+
+1. Ordena as tarefas pelo horário de término.
+2. Calcula `p(j)`, a última tarefa que termina até o início da tarefa `j` (0 se não existe), com busca binária.
+3. Preenche a tabela `M` de baixo para cima:
+
+```
+M[0] = 0
+M[j] = max( valor(j) + M[p(j)],   pega a tarefa j
+            M[j-1] )              pula a tarefa j
+```
+
+O valor máximo é `M[n]`. A ordenação e as buscas binárias custam O(n log n); a PD em si é O(n). Há também uma versão recursiva com memoização (`calcularTabelaMemo`), só para comparação.
+
 ## Formato das tarefas
 
 Cada tarefa tem `nome`, `inicio`, `fim` (`HH:MM`, de `00:00` a `24:00`) e `valor` (número maior ou igual a zero). Tarefas que encostam (uma termina às 15:00 e a outra começa às 15:00) **não** se sobrepõem.
