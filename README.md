@@ -38,9 +38,30 @@ npm test
 
 ```
 index.html            página principal
+src/tarefa.js         modelo da tarefa, conversão de horários, validação e regra de sobreposição
+src/entrada.js        leitura de tarefas de arquivos JSON e CSV
 src/agendador.js      algoritmo (PD), sem nada de interface — testável sozinho
 src/app.js            interface: lê as tarefas da tela e mostra o resultado
 src/estilo.css        estilos
 tests/                testes automatizados (node --test)
 scripts/servidor.js   servidor local para o `npm start`
 ```
+
+## Formato das tarefas
+
+Cada tarefa tem `nome`, `inicio`, `fim` (`HH:MM`, de `00:00` a `24:00`) e `valor` (número maior ou igual a zero). Tarefas que encostam (uma termina às 15:00 e a outra começa às 15:00) **não** se sobrepõem.
+
+JSON (`.json`): lista de tarefas ou `{ "tarefas": [...] }`.
+
+```json
+[{ "nome": "Live de lançamento", "inicio": "14:00", "fim": "15:30", "valor": 10 }]
+```
+
+CSV (`.csv`): cabeçalho `nome,inicio,fim,valor`, separador vírgula ou ponto e vírgula.
+
+```csv
+nome,inicio,fim,valor
+Live de lançamento,14:00,15:30,10
+```
+
+Entradas inválidas geram mensagens indicando a tarefa e o campo com problema.
