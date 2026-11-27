@@ -60,7 +60,15 @@ test('a ordem de entrada não muda o resultado', () => {
 });
 
 test('lista vazia, uma tarefa, valores zero e valores decimais', () => {
-  assert.deepEqual(agendar([]), { tarefas: [], p: [0], M: [0], valorMaximo: 0 });
+  assert.deepEqual(agendar([]), {
+    tarefas: [],
+    p: [0],
+    M: [0],
+    valorMaximo: 0,
+    escolhidas: [],
+    indicesEscolhidos: [],
+    passos: [],
+  });
   assert.equal(agendar([t('A', '08:00', '09:00', 4)]).valorMaximo, 4);
   assert.equal(agendar([t('A', '08:00', '09:00', 0), t('B', '08:30', '10:00', 0)]).valorMaximo, 0);
   assert.equal(agendar([t('A', '08:00', '09:00', 1.5), t('B', '09:00', '10:00', 2.25)]).valorMaximo, 3.75);

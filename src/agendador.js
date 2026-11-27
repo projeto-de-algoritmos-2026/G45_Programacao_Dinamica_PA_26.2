@@ -1,6 +1,5 @@
 // Algoritmo do agendador (Weighted Interval Scheduling).
 // Não usa nada do navegador: roda igual no browser e nos testes do Node.
-// Reconstrução das tarefas escolhidas: issue #5
 
 // Devolve uma cópia das tarefas ordenada pelo horário de término (crescente).
 // A ordenação é estável: tarefas que terminam juntas mantêm a ordem em que foram dadas.
@@ -67,11 +66,43 @@ export function calcularTabelaMemo(ordenadas, p) {
   return { M, chamadas };
 }
 
+// Reconstrói quais tarefas formam o ótimo, só lendo a tabela M (sem recalcular a PD).
+// Anda de j = n para trás: se pegar j é pelo menos tão bom quanto pular, j entra e o próximo é p(j);
+// senão, pula para j - 1. Cada passo diminui j, então é O(n).
+// Devolve os índices (1-based) escolhidos em ordem crescente, que é a ordem cronológica, e os passos
+// do caminho (j visitado e se a tarefa foi escolhida), para a visualização destacar o traceback.
+export function reconstruir(ordenadas, p, M) {
+  const indices = [];
+  const passos = [];
+  let j = ordenadas.length;
+  while (j > 0) {
+    const escolhe = ordenadas[j - 1].valor + M[p[j]] >= M[j - 1];
+    passos.push({ j, escolhe });
+    if (escolhe) {
+      indices.push(j);
+      j = p[j];
+    } else {
+      j = j - 1;
+    }
+  }
+  return { indices: indices.reverse(), passos };
+}
+
 // Weighted Interval Scheduling completo: recebe as tarefas em qualquer ordem e devolve
-// as tarefas ordenadas, p, a tabela M e o valor máximo (M[n]).
-// Complexidade: O(n log n), por causa da ordenação e das n buscas binárias do p(j); a PD em si é O(n).
+// as tarefas ordenadas, p, a tabela M, o valor máximo (M[n]), as tarefas escolhidas em ordem
+// cronológica (com seus índices) e os passos da reconstrução.
+// Complexidade: O(n log n), por causa da ordenação e das n buscas binárias do p(j); a PD e a reconstrução são O(n).
 export function agendar(tarefas) {
   const { tarefas: ordenadas, p } = prepararTarefas(tarefas);
   const M = calcularTabela(ordenadas, p);
-  return { tarefas: ordenadas, p, M, valorMaximo: M[ordenadas.length] };
+  const { indices, passos } = reconstruir(ordenadas, p, M);
+  return {
+    tarefas: ordenadas,
+    p,
+    M,
+    valorMaximo: M[ordenadas.length],
+    escolhidas: indices.map((j) => ordenadas[j - 1]),
+    indicesEscolhidos: indices,
+    passos,
+  };
 }
