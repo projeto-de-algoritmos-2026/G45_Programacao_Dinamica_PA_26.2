@@ -34,6 +34,9 @@ Abra http://localhost:8000 no navegador. (Para usar outra porta: `PORT=3000 npm 
 2. Clique em **Otimizar agenda**.
 3. A tela mostra o valor total, as tarefas escolhidas em ordem cronológica e as que ficaram de fora. Se a lista mudar depois disso, o resultado fica marcado como desatualizado até otimizar de novo.
 
+4. Em **Como a PD chegou nisso**, a linha do tempo mostra cada tarefa como uma barra no seu horário (escolhidas em destaque, as que ficaram de fora tracejadas) e a tabela da PD mostra `j`, a tarefa, `p(j)`, os dois lados do max (pegar e pular), `M[j]` e se a tarefa entrou na agenda. Os botões **Do início**, **Anterior**, **Próximo** e **Reproduzir** preenchem `M[j]` uma linha por vez e depois refazem a volta de `j = n` até 0, com a conta de cada etapa escrita por extenso. Com mais de 60 tarefas, essa parte fica oculta para a página não pesar.
+5. Em **PD × guloso**, o resultado da PD aparece ao lado do guloso que pega primeiro a tarefa de maior valor. No exemplo pronto, o guloso fica com 29 e a PD com 33.
+
 Entradas inválidas (fim antes do início, valor negativo, campo vazio, arquivo com erro) aparecem como mensagens logo abaixo do formulário ou dos botões de arquivo, sem apagar o que já estava na lista.
 
 ## Testes
@@ -59,6 +62,8 @@ src/tarefa.js         modelo da tarefa, conversão de horários, validação e r
 src/entrada.js        leitura de tarefas de arquivos JSON e CSV
 src/agendador.js      algoritmo (PD), sem nada de interface — testável sozinho
 src/comparacao.js     força bruta e guloso por valor, para comparar com a PD
+src/explicacao.js     linhas da tabela da PD, textos do passo a passo e escala da linha do tempo (testável sozinho)
+src/visualizacao.js   desenha a linha do tempo, a tabela da PD e a comparação com o guloso
 src/app.js            interface: lê as tarefas da tela e mostra o resultado
 src/estilo.css        estilos
 exemplos/             agendas prontas para carregar na interface

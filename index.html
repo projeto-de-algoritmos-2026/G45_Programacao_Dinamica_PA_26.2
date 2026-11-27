@@ -71,6 +71,63 @@
         <ul id="lista-descartadas" class="lista-tarefas descartadas"></ul>
       </div>
     </section>
+
+    <section id="painel-explicacao" class="painel" aria-labelledby="titulo-explicacao" hidden>
+      <h2 id="titulo-explicacao">Como a PD chegou nisso</h2>
+      <p id="aviso-limite" class="aviso" hidden></p>
+      <div id="conteudo-explicacao">
+        <h3>Linha do tempo</h3>
+        <ul class="legenda">
+          <li><span class="amostra escolhida"></span>escolhida</li>
+          <li><span class="amostra fora"></span>ficou de fora</li>
+          <li><span class="amostra atual"></span>tarefa j em análise</li>
+          <li><span class="amostra referencia"></span>p(j) ou próxima da volta</li>
+        </ul>
+        <div id="linha-do-tempo" class="linha-do-tempo"></div>
+
+        <h3>Tabela da PD</h3>
+        <pre class="formula">M[0] = 0
+M[j] = max( valor(j) + M[p(j)],   pega a tarefa j
+            M[j-1] )              pula a tarefa j</pre>
+        <div class="controles" role="group" aria-label="Passo a passo">
+          <button type="button" id="passo-inicio">Do início</button>
+          <button type="button" id="passo-anterior" aria-label="Passo anterior">◀ Anterior</button>
+          <button type="button" id="passo-play" class="primario">▶ Reproduzir</button>
+          <button type="button" id="passo-proximo" aria-label="Próximo passo">Próximo ▶</button>
+          <button type="button" id="passo-tudo">Ver tudo</button>
+          <span id="contador-passo"></span>
+        </div>
+        <p id="texto-passo" class="explicacao" aria-live="polite"></p>
+        <div class="rolagem">
+          <table id="tabela-pd">
+            <thead>
+              <tr>
+                <th class="numero">j</th>
+                <th>Tarefa</th>
+                <th>Horário</th>
+                <th class="numero">Valor</th>
+                <th class="numero">p(j)</th>
+                <th class="numero">Pegar: valor + M[p(j)]</th>
+                <th class="numero">Pular: M[j−1]</th>
+                <th class="numero">M[j]</th>
+                <th>Na agenda</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="painel-guloso" class="painel" aria-labelledby="titulo-guloso" hidden>
+      <h2 id="titulo-guloso">PD × guloso</h2>
+      <p class="dica">O guloso pega primeiro a tarefa de maior valor e vai encaixando as que não se sobrepõem. É rápido, mas uma tarefa valiosa pode bloquear várias menores que, juntas, valem mais.</p>
+      <div class="comparacao">
+        <div id="cartao-pd" class="cartao"></div>
+        <div id="cartao-guloso" class="cartao"></div>
+      </div>
+      <p id="veredito"></p>
+    </section>
   </main>
   <script type="module" src="src/app.js"></script>
 </body>
