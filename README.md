@@ -28,6 +28,14 @@ npm start
 
 Abra http://localhost:8000 no navegador. (Para usar outra porta: `PORT=3000 npm start`.)
 
+## Como usar
+
+1. Cadastre as tarefas no formulário (nome, início, fim e valor) ou use **Carregar exemplo** / **Importar arquivo** (`.json` ou `.csv`, formato abaixo). Cada tarefa da lista pode ser editada ou removida.
+2. Clique em **Otimizar agenda**.
+3. A tela mostra o valor total, as tarefas escolhidas em ordem cronológica e as que ficaram de fora. Se a lista mudar depois disso, o resultado fica marcado como desatualizado até otimizar de novo.
+
+Entradas inválidas (fim antes do início, valor negativo, campo vazio, arquivo com erro) aparecem como mensagens logo abaixo do formulário ou dos botões de arquivo, sem apagar o que já estava na lista.
+
 ## Testes
 
 ```bash
@@ -53,6 +61,7 @@ src/agendador.js      algoritmo (PD), sem nada de interface — testável sozinh
 src/comparacao.js     força bruta e guloso por valor, para comparar com a PD
 src/app.js            interface: lê as tarefas da tela e mostra o resultado
 src/estilo.css        estilos
+exemplos/             agendas prontas para carregar na interface
 tests/                testes automatizados (node --test)
 scripts/servidor.js   servidor local para o `npm start`
 ```
