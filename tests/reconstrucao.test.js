@@ -1,22 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { agendar, calcularTabela, prepararTarefas, reconstruir } from '../src/agendador.js';
-import { Tarefa, sobrepoe } from '../src/tarefa.js';
-
-const t = (nome, inicio, fim, valor) => new Tarefa({ nome, inicio, fim, valor });
-const nomes = (tarefas) => tarefas.map((x) => x.nome);
-const soma = (tarefas) => tarefas.reduce((total, x) => total + x.valor, 0);
-
-function semSobreposicao(tarefas) {
-  return tarefas.every((a, i) => tarefas.slice(i + 1).every((b) => !sobrepoe(a, b)));
-}
-
-function geradorAleatorio(semente) {
-  return (maximo) => {
-    semente = (semente * 1103515245 + 12345) % 2147483648;
-    return semente % maximo;
-  };
-}
+import { geradorAleatorio, nomes, semSobreposicao, soma, t } from './apoio.js';
 
 test('exemplo da issue 3 com valores: escolhe A e C', () => {
   const r = agendar([t('C', '10:00', '12:00', 4), t('B', '09:00', '11:00', 7), t('A', '08:00', '10:00', 5)]);

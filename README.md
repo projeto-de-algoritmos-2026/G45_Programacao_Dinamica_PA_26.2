@@ -34,6 +34,15 @@ Abra http://localhost:8000 no navegador. (Para usar outra porta: `PORT=3000 npm 
 npm test
 ```
 
+Roda todos os testes de `tests/` com o `node --test`, sem instalar nada. Eles cobrem:
+
+- validação da entrada e leitura de JSON/CSV;
+- ordenação e `p(j)`, comparados com uma busca ingênua;
+- a PD e a reconstrução, com exemplos conferidos à mão;
+- casos de borda: lista vazia, uma tarefa, nenhuma sobreposição, tudo sobreposto, tarefas que encostam, empates de valor e horários idênticos;
+- um caso em que o guloso (pegar a de maior valor primeiro) erra e a PD acerta;
+- PD × força bruta (todos os subconjuntos, `src/comparacao.js`) em 800 entradas aleatórias de até 15 tarefas.
+
 ## Estrutura
 
 ```
@@ -41,6 +50,7 @@ index.html            página principal
 src/tarefa.js         modelo da tarefa, conversão de horários, validação e regra de sobreposição
 src/entrada.js        leitura de tarefas de arquivos JSON e CSV
 src/agendador.js      algoritmo (PD), sem nada de interface — testável sozinho
+src/comparacao.js     força bruta e guloso por valor, para comparar com a PD
 src/app.js            interface: lê as tarefas da tela e mostra o resultado
 src/estilo.css        estilos
 tests/                testes automatizados (node --test)

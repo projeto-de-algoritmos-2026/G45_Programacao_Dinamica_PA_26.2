@@ -1,27 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { agendar, calcularTabela, calcularTabelaMemo, prepararTarefas } from '../src/agendador.js';
-import { Tarefa, sobrepoe } from '../src/tarefa.js';
-
-const t = (nome, inicio, fim, valor) => new Tarefa({ nome, inicio, fim, valor });
-
-// Força bruta: testa todos os subconjuntos sem sobreposição. Só serve para n pequeno (2^n).
-function valorForcaBruta(tarefas) {
-  let melhor = 0;
-  for (let mascara = 0; mascara < 1 << tarefas.length; mascara++) {
-    const escolhidas = tarefas.filter((_, i) => mascara & (1 << i));
-    const compativel = escolhidas.every((a, i) => escolhidas.slice(i + 1).every((b) => !sobrepoe(a, b)));
-    if (compativel) melhor = Math.max(melhor, escolhidas.reduce((soma, x) => soma + x.valor, 0));
-  }
-  return melhor;
-}
-
-function geradorAleatorio(semente) {
-  return (maximo) => {
-    semente = (semente * 1103515245 + 12345) % 2147483648;
-    return semente % maximo;
-  };
-}
+import { forcaBruta } from '../src/comparacao.js';
+import { geradorAleatorio, t } from './apoio.js';
 
 test('exemplo da issue 3 com valores: A 08-10 (5), B 09-11 (7), C 10-12 (4) -> 9', () => {
   const r = agendar([t('A', '08:00', '10:00', 5), t('B', '09:00', '11:00', 7), t('C', '10:00', '12:00', 4)]);
@@ -92,7 +73,7 @@ test('o valor máximo bate com a força bruta em listas aleatórias', () => {
       const inicio = sortear(48) * 15;
       return t(`T${k}`, inicio, inicio + 15 * (1 + sortear(8)), sortear(10));
     });
-    assert.equal(agendar(tarefas).valorMaximo, valorForcaBruta(tarefas), `rodada ${rodada}`);
+    assert.equal(agendar(tarefas).valorMaximo, forcaBruta(tarefas).valor, `rodada ${rodada}`);
   }
 });
 
