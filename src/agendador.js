@@ -17,7 +17,8 @@ export function calcularP(ordenadas) {
   const p = new Array(ordenadas.length + 1).fill(0);
   for (let j = 1; j <= ordenadas.length; j++) {
     const inicio = ordenadas[j - 1].inicio;
-    // Procura o maior i em [0, j-1) com fim <= inicio; baixo termina sendo esse i (contado a partir de 1).
+    // Entre as j-1 tarefas anteriores (ordenadas por fim), as que terminam até o início de j formam um prefixo.
+    // A busca binária acha o tamanho desse prefixo, que é exatamente o índice (1-based) da última compatível.
     let baixo = 0;
     let alto = j - 1;
     while (baixo < alto) {
