@@ -1,22 +1,32 @@
 // Interface: lê as tarefas da tela, chama o agendador e mostra o resultado.
 import { agendar } from './agendador.js';
+import { gulosoPorValor } from './comparacao.js';
 import { lerArquivo, lerJSON } from './entrada.js';
+import { formatarValor, linhasDaTabela, roteiro } from './explicacao.js';
 import { ErroDeValidacao, Tarefa, minutosParaHorario } from './tarefa.js';
+import { desenharComparacao, desenharLinhaDoTempo, desenharTabelaPD } from './visualizacao.js';
 
 const EXEMPLO = 'exemplos/exemplo-pequeno.json';
+// Acima disso, a linha do tempo e a tabela ficariam enormes; o resultado e a comparação continuam aparecendo.
+const LIMITE_VISUALIZACAO = 60;
+const INTERVALO_REPRODUCAO = 1600; // ms entre etapas no modo "Reproduzir"
 
 const estado = {
   tarefas: [],
   editando: null, // índice da tarefa em edição, ou null
   resultado: null,
   desatualizado: false,
+  linhas: [], // linhas da tabela da PD do último resultado
+  roteiro: [], // etapas do passo a passo do último resultado
+  guloso: null, // resultado do guloso para as mesmas tarefas
+  etapa: null, // índice da etapa do passo a passo, ou null para mostrar tudo
+  reproducao: null, // id do setInterval do modo "Reproduzir"
 };
 
 const $ = (seletor) => document.querySelector(seletor);
 const form = $('#form-tarefa');
 const corpoTabela = $('#tabela-tarefas tbody');
 
-const formatarValor = (valor) => valor.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
 const horario = (minutos) => minutosParaHorario(minutos);
 
 function criar(tag, texto, classe) {
@@ -63,11 +73,13 @@ function sairDaEdicao() {
 
 // Qualquer mudança na lista invalida o resultado mostrado.
 function tarefasMudaram() {
+  pararReproducao();
   if (estado.resultado) estado.desatualizado = true;
   renderizar();
 }
 
 function substituirTarefas(tarefas) {
+  pararReproducao();
   sairDaEdicao();
   estado.tarefas = tarefas;
   estado.resultado = null;
@@ -144,9 +156,59 @@ function renderizarResultado() {
   );
 }
 
+function pararReproducao() {
+  clearInterval(estado.reproducao);
+  estado.reproducao = null;
+}
+
+function irParaEtapa(indice) {
+  estado.etapa = indice === null ? null : Math.max(0, Math.min(indice, estado.roteiro.length - 1));
+  renderizarVisualizacao();
+}
+
+function renderizarVisualizacao() {
+  const r = estado.resultado;
+  $('#painel-explicacao').hidden = !r;
+  $('#painel-guloso').hidden = !r;
+  $('#painel-explicacao').classList.toggle('desatualizado', estado.desatualizado);
+  $('#painel-guloso').classList.toggle('desatualizado', estado.desatualizado);
+  if (!r) return;
+
+  desenharComparacao(
+    { cartaoPD: $('#cartao-pd'), cartaoGuloso: $('#cartao-guloso'), veredito: $('#veredito') },
+    r,
+    estado.guloso,
+  );
+
+  const grande = r.tarefas.length > LIMITE_VISUALIZACAO;
+  $('#aviso-limite').hidden = !grande;
+  $('#aviso-limite').textContent = grande
+    ? `A linha do tempo e a tabela da PD aparecem só com até ${LIMITE_VISUALIZACAO} tarefas ` +
+      `(esta agenda tem ${r.tarefas.length}). O resultado acima e a comparação com o guloso continuam completos.`
+    : '';
+  $('#conteudo-explicacao').hidden = grande;
+  if (grande) return;
+
+  const etapa = estado.etapa === null ? null : estado.roteiro[estado.etapa];
+  desenharLinhaDoTempo($('#linha-do-tempo'), r, etapa);
+  desenharTabelaPD($('#tabela-pd tbody'), estado.linhas, r, etapa);
+
+  const ultima = estado.roteiro.length - 1;
+  $('#texto-passo').textContent = etapa
+    ? etapa.texto
+    : 'Resultado completo: a tabela mostra M[j] de cada tarefa, o lado do max que venceu (em destaque) e quais ' +
+      'tarefas a volta de j = n até 0 colocou na agenda. Use "Do início" ou "Próximo" para ver passo a passo.';
+  $('#contador-passo').textContent = etapa ? `Etapa ${estado.etapa + 1} de ${ultima + 1}` : '';
+  $('#passo-anterior').disabled = estado.etapa === null || estado.etapa === 0;
+  $('#passo-proximo').disabled = estado.etapa === ultima;
+  $('#passo-tudo').disabled = estado.etapa === null;
+  $('#passo-play').textContent = estado.reproducao ? '❚❚ Pausar' : '▶ Reproduzir';
+}
+
 function renderizar() {
   renderizarTabela();
   renderizarResultado();
+  renderizarVisualizacao();
 }
 
 form.addEventListener('submit', (evento) => {
@@ -199,9 +261,54 @@ $('#botao-limpar').addEventListener('click', () => {
 });
 
 $('#botao-otimizar').addEventListener('click', () => {
+  pararReproducao();
   estado.resultado = agendar(estado.tarefas);
+  estado.linhas = linhasDaTabela(estado.resultado);
+  estado.roteiro = roteiro(estado.resultado);
+  estado.guloso = gulosoPorValor(estado.tarefas);
+  estado.etapa = null;
   estado.desatualizado = false;
   renderizar();
+});
+
+// Passo a passo: começa no M[0], anda uma etapa por vez e "Ver tudo" volta ao resultado completo.
+$('#passo-inicio').addEventListener('click', () => {
+  pararReproducao();
+  irParaEtapa(0);
+});
+
+$('#passo-anterior').addEventListener('click', () => {
+  pararReproducao();
+  irParaEtapa(estado.etapa - 1);
+});
+
+$('#passo-proximo').addEventListener('click', () => {
+  pararReproducao();
+  irParaEtapa(estado.etapa === null ? 0 : estado.etapa + 1);
+});
+
+$('#passo-tudo').addEventListener('click', () => {
+  pararReproducao();
+  irParaEtapa(null);
+});
+
+$('#passo-play').addEventListener('click', () => {
+  if (estado.reproducao) {
+    pararReproducao();
+    renderizarVisualizacao();
+    return;
+  }
+  const ultima = estado.roteiro.length - 1;
+  if (estado.etapa === null || estado.etapa === ultima) estado.etapa = 0;
+  estado.reproducao = setInterval(() => {
+    if (estado.etapa >= ultima) {
+      pararReproducao();
+      renderizarVisualizacao();
+    } else {
+      irParaEtapa(estado.etapa + 1);
+    }
+  }, INTERVALO_REPRODUCAO);
+  renderizarVisualizacao();
 });
 
 renderizar();

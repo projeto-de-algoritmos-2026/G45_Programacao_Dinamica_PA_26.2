@@ -15,6 +15,12 @@
   --erro-fundo: #fef3f2;
   --aviso-fundo: #fff7e0;
   --aviso-texto: #7a4b00;
+  --neutra-fundo: #e8ebf1;
+  --neutra-borda: #b9c0cd;
+  --atual: #d97706;
+  --atual-fundo: #fff1dc;
+  --referencia: #0e8a7e;
+  --referencia-fundo: #def5f2;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +37,12 @@
     --erro-fundo: #3a1d1d;
     --aviso-fundo: #3a2f12;
     --aviso-texto: #ffd27a;
+    --neutra-fundo: #2a3040;
+    --neutra-borda: #4a5368;
+    --atual: #f5a524;
+    --atual-fundo: #3d2e14;
+    --referencia: #3cc7b8;
+    --referencia-fundo: #133632;
   }
 }
 
@@ -260,7 +272,8 @@ tr.em-edicao {
   color: var(--suave);
 }
 
-#resultado.desatualizado {
+#resultado.desatualizado,
+.painel.desatualizado {
   opacity: 0.55;
 }
 
@@ -304,65 +317,343 @@ tr.em-edicao {
   white-space: nowrap;
 }
 
+
+/* ---------- Como a PD chegou nisso: legenda, linha do tempo, passo a passo e tabela ---------- */
+
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--suave);
+}
+
+.legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amostra {
+  display: inline-block;
+  width: 18px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.linha-do-tempo {
+  font-size: 0.8125rem;
+}
+
+.faixa {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+}
+
+.faixa .rotulo {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--suave);
+}
+
+.faixa.em-foco .rotulo {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.trilho {
+  position: relative;
+  height: 22px;
+}
+
+.eixo .trilho {
+  height: 18px;
+}
+
+.marca {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--borda);
+}
+
+.eixo .marca {
+  background: none;
+}
+
+.eixo .marca span {
+  position: absolute;
+  transform: translateX(-50%);
+  color: var(--suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.eixo .marca:first-child span {
+  transform: none;
+}
+
+.eixo .marca:last-child span {
+  transform: translateX(-100%);
+}
+
+.bloco {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: 5px;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 16px;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.bloco.atual,
+.bloco.referencia {
+  line-height: 14px;
+}
+
+.bloco,
+.amostra.neutra {
+  background: var(--neutra-fundo);
+  color: var(--texto);
+  border: 1px solid var(--neutra-borda);
+}
+
+.bloco.escolhida,
+.amostra.escolhida {
+  background: var(--destaque);
+  border-color: var(--destaque);
+  color: var(--destaque-texto);
+}
+
+.bloco.fora,
+.amostra.fora {
+  background: transparent;
+  border: 1px dashed var(--neutra-borda);
+  color: var(--suave);
+}
+
+.bloco.pendente {
+  opacity: 0.3;
+}
+
+.bloco.atual,
+.amostra.atual {
+  background: var(--atual-fundo);
+  border: 2px solid var(--atual);
+  color: var(--texto);
+}
+
+.bloco.referencia,
+.amostra.referencia {
+  background: var(--referencia-fundo);
+  border: 2px dashed var(--referencia);
+  color: var(--texto);
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+#contador-passo {
+  font-size: 0.8125rem;
+  color: var(--suave);
+  font-variant-numeric: tabular-nums;
+}
+
+.explicacao {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--destaque);
+  background: var(--destaque-fundo);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9375rem;
+}
+
+.formula {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  white-space: pre;
+  overflow-x: auto;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: var(--fundo);
+  border-radius: 8px;
+}
+
+.rolagem {
+  overflow-x: auto;
+}
+
+#tabela-pd {
+  margin-top: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+#tabela-pd th,
+#tabela-pd td {
+  white-space: nowrap;
+}
+
+#tabela-pd td.nome-tarefa {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#tabela-pd tr.atual {
+  background: var(--atual-fundo);
+  box-shadow: inset 4px 0 0 var(--atual);
+}
+
+#tabela-pd tr.referencia {
+  background: var(--referencia-fundo);
+  box-shadow: inset 4px 0 0 var(--referencia);
+}
+
+#tabela-pd tr.caminho td:last-child {
+  font-weight: 600;
+}
+
+#tabela-pd .vencedor {
+  font-weight: 700;
+  color: var(--destaque);
+}
+
+#tabela-pd .vazio-celula {
+  color: var(--borda);
+}
+
+.entra {
+  color: var(--destaque);
+  font-weight: 700;
+}
+
+.pula {
+  color: var(--suave);
+}
+
+/* ---------- PD × guloso ---------- */
+
+.comparacao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cartao {
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.cartao.vencedor {
+  border-color: var(--destaque);
+  box-shadow: 0 0 0 1px var(--destaque);
+}
+
+.cartao h3 {
+  margin: 0 0 4px;
+}
+
+.cartao .valor-cartao {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.cartao ol {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.875rem;
+}
+
+#veredito {
+  margin: 12px 0 0;
+  font-weight: 600;
+}
+
 @media (max-width: 640px) {
-  table,
-  thead,
-  tbody,
-  tr,
-  td {
-    display: block;
+  .faixa {
+    grid-template-columns: minmax(0, 96px) minmax(0, 1fr);
+    gap: 6px;
   }
 
-  thead {
+  .eixo .marca.secundaria span {
     display: none;
   }
 
-  tr {
+  .comparacao {
+    grid-template-columns: 1fr;
+  }
+
+  /* No celular, cada tarefa da lista vira um cartão: nome numa linha, "08:00–09:30 · valor 3" na outra. */
+  #tabela-tarefas,
+  #tabela-tarefas thead,
+  #tabela-tarefas tbody {
+    display: block;
+  }
+
+  #tabela-tarefas thead {
+    display: none;
+  }
+
+  #tabela-tarefas tr {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
     border-bottom: 1px solid var(--borda);
     padding: 8px 0;
   }
 
-  /* No celular, cada tarefa vira um cartão: nome numa linha, "08:00–09:30 · valor 3" na outra. */
-  tr {
-    display: grid;
-    grid-template-columns: auto auto 1fr;
-    align-items: center;
-    column-gap: 0;
-  }
-
-  td,
-  td.numero {
+  #tabela-tarefas td,
+  #tabela-tarefas td.numero {
     display: block;
     border: none;
     padding: 2px 0;
     text-align: left;
   }
 
-  td:first-child {
+  #tabela-tarefas td:first-child {
     grid-column: 1 / -1;
     font-weight: 600;
   }
 
-  td:nth-child(2)::after {
+  #tabela-tarefas td:nth-child(2)::after {
     content: "–";
   }
 
-  td.numero {
+  #tabela-tarefas td.numero {
     padding-left: 12px;
   }
 
-  td.numero::before {
+  #tabela-tarefas td.numero::before {
     content: "valor ";
     color: var(--suave);
   }
 
-  .acoes-linha {
+  #tabela-tarefas .acoes-linha {
     grid-column: 1 / -1;
     text-align: left;
     padding-top: 6px;
   }
 
-  .acoes-linha button {
+  #tabela-tarefas .acoes-linha button {
     margin: 0 4px 0 0;
   }
 }
