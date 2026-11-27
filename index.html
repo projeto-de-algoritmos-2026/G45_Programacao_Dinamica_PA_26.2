@@ -4,13 +4,73 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Agendador de Lives</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%235b3fd6'/%3E%3Crect x='6' y='9' width='12' height='5' rx='2' fill='white'/%3E%3Crect x='14' y='18' width='12' height='5' rx='2' fill='white'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="src/estilo.css">
 </head>
 <body>
   <main>
-    <h1>Agendador de Lives</h1>
-    <p>Escolhe o conjunto de lives/tarefas sem sobreposição que rende mais, usando Programação Dinâmica (Weighted Interval Scheduling).</p>
-    <div id="app"></div>
+    <header>
+      <h1>Agendador de Lives</h1>
+      <p>Cadastre as lives ou tarefas do dia, cada uma com horário e valor (audiência, cachê, prioridade). O agendador usa Programação Dinâmica (Weighted Interval Scheduling) para escolher o conjunto <strong>sem sobreposição</strong> que rende o <strong>maior valor total</strong>.</p>
+    </header>
+
+    <section class="painel" aria-labelledby="titulo-tarefas">
+      <h2 id="titulo-tarefas">Tarefas</h2>
+
+      <form id="form-tarefa" novalidate>
+        <div class="campos">
+          <label>Nome
+            <input name="nome" type="text" placeholder="Live de lançamento" autocomplete="off">
+          </label>
+          <label>Início
+            <input name="inicio" type="time">
+          </label>
+          <label>Fim
+            <input name="fim" type="time">
+          </label>
+          <label>Valor
+            <input name="valor" type="text" inputmode="decimal" placeholder="10" autocomplete="off">
+          </label>
+        </div>
+        <p class="dica">Tarefas que encostam (uma termina às 15:00 e a outra começa às 15:00) não se sobrepõem. Fim 00:00 significa meia-noite (24:00).</p>
+        <div class="acoes">
+          <button type="submit" id="botao-salvar" class="primario">Adicionar tarefa</button>
+          <button type="button" id="botao-cancelar" hidden>Cancelar edição</button>
+        </div>
+        <ul id="erros-form" class="erros" role="alert" hidden></ul>
+      </form>
+
+      <div class="acoes barra">
+        <button type="button" id="botao-exemplo">Carregar exemplo</button>
+        <label class="botao">Importar arquivo (.json ou .csv)
+          <input type="file" id="arquivo" accept=".json,.csv,application/json,text/csv" hidden>
+        </label>
+        <button type="button" id="botao-limpar">Limpar tudo</button>
+      </div>
+      <ul id="erros-arquivo" class="erros" role="alert" hidden></ul>
+
+      <p id="sem-tarefas" class="vazio">Nenhuma tarefa ainda. Adicione uma acima, carregue o exemplo ou importe um arquivo.</p>
+      <table id="tabela-tarefas" hidden>
+        <thead>
+          <tr><th>Nome</th><th>Início</th><th>Fim</th><th class="numero">Valor</th><th><span class="sr-only">Ações</span></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="painel" aria-labelledby="titulo-resultado">
+      <h2 id="titulo-resultado">Agenda otimizada</h2>
+      <button type="button" id="botao-otimizar" class="primario grande" disabled>Otimizar agenda</button>
+      <p id="aviso-desatualizado" class="aviso" hidden>As tarefas mudaram desde a última otimização. Clique em "Otimizar agenda" de novo.</p>
+      <div id="resultado" hidden>
+        <p class="total">Valor total: <strong id="valor-total"></strong></p>
+        <p id="resumo"></p>
+        <h3>Escolhidas (em ordem cronológica)</h3>
+        <ol id="lista-escolhidas" class="lista-tarefas"></ol>
+        <h3>Ficaram de fora</h3>
+        <ul id="lista-descartadas" class="lista-tarefas descartadas"></ul>
+      </div>
+    </section>
   </main>
   <script type="module" src="src/app.js"></script>
 </body>
