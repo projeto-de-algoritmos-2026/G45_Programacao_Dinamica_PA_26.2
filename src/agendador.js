@@ -1,6 +1,6 @@
 // Algoritmo do agendador (Weighted Interval Scheduling).
 // Não usa nada do navegador: roda igual no browser e nos testes do Node.
-// PD: issue #4 · reconstrução: issue #5
+// Reconstrução das tarefas escolhidas: issue #5
 
 // Devolve uma cópia das tarefas ordenada pelo horário de término (crescente).
 // A ordenação é estável: tarefas que terminam juntas mantêm a ordem em que foram dadas.
@@ -35,4 +35,43 @@ export function calcularP(ordenadas) {
 export function prepararTarefas(tarefas) {
   const ordenadas = ordenarPorTermino(tarefas);
   return { tarefas: ordenadas, p: calcularP(ordenadas) };
+}
+
+// PD bottom-up. M[j] = maior valor total usando só as j primeiras tarefas (ordenadas por término):
+//   M[0] = 0
+//   M[j] = max( valor(j) + M[p(j)],   pega a tarefa j
+//               M[j-1] )              pula a tarefa j
+// Cada M[j] só depende de posições menores, então basta preencher de 1 a n: O(n) de tempo e de espaço.
+export function calcularTabela(ordenadas, p) {
+  const M = new Array(ordenadas.length + 1).fill(0);
+  for (let j = 1; j <= ordenadas.length; j++) {
+    M[j] = Math.max(ordenadas[j - 1].valor + M[p[j]], M[j - 1]);
+  }
+  return M;
+}
+
+// Mesma recorrência, top-down: recursão com memoização (versão didática, para comparar com a bottom-up).
+// Cada OPT(j) é calculado uma vez só, então também é O(n), mas a recursão chega a n níveis de profundidade
+// e estoura a pilha para listas muito grandes; por isso o agendador usa a versão bottom-up.
+// Devolve a tabela preenchida e quantas vezes OPT foi chamado (para mostrar o efeito da memoização).
+export function calcularTabelaMemo(ordenadas, p) {
+  const M = new Array(ordenadas.length + 1).fill(undefined);
+  M[0] = 0;
+  let chamadas = 0;
+  const opt = (j) => {
+    chamadas++;
+    if (M[j] === undefined) M[j] = Math.max(ordenadas[j - 1].valor + opt(p[j]), opt(j - 1));
+    return M[j];
+  };
+  opt(ordenadas.length);
+  return { M, chamadas };
+}
+
+// Weighted Interval Scheduling completo: recebe as tarefas em qualquer ordem e devolve
+// as tarefas ordenadas, p, a tabela M e o valor máximo (M[n]).
+// Complexidade: O(n log n), por causa da ordenação e das n buscas binárias do p(j); a PD em si é O(n).
+export function agendar(tarefas) {
+  const { tarefas: ordenadas, p } = prepararTarefas(tarefas);
+  const M = calcularTabela(ordenadas, p);
+  return { tarefas: ordenadas, p, M, valorMaximo: M[ordenadas.length] };
 }
