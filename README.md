@@ -30,14 +30,28 @@ Abra http://localhost:8000 no navegador. (Para usar outra porta: `PORT=3000 npm 
 
 ## Como usar
 
-1. Cadastre as tarefas no formulário (nome, início, fim e valor) ou use **Carregar exemplo** / **Importar arquivo** (`.json` ou `.csv`, formato abaixo). Cada tarefa da lista pode ser editada ou removida.
+1. Cadastre as tarefas no formulário (nome, início, fim e valor) ou escolha um exemplo pronto e clique em **Carregar exemplo** (veja [Exemplos](#exemplos)), ou use **Importar arquivo** (`.json` ou `.csv`, formato abaixo). Cada tarefa da lista pode ser editada ou removida.
 2. Clique em **Otimizar agenda**.
 3. A tela mostra o valor total, as tarefas escolhidas em ordem cronológica e as que ficaram de fora. Se a lista mudar depois disso, o resultado fica marcado como desatualizado até otimizar de novo.
 
 4. Em **Como a PD chegou nisso**, a linha do tempo mostra cada tarefa como uma barra no seu horário (escolhidas em destaque, as que ficaram de fora tracejadas) e a tabela da PD mostra `j`, a tarefa, `p(j)`, os dois lados do max (pegar e pular), `M[j]` e se a tarefa entrou na agenda. Os botões **Do início**, **Anterior**, **Próximo** e **Reproduzir** preenchem `M[j]` uma linha por vez e depois refazem a volta de `j = n` até 0, com a conta de cada etapa escrita por extenso. Com mais de 60 tarefas, essa parte fica oculta para a página não pesar.
-5. Em **PD × guloso**, o resultado da PD aparece ao lado do guloso que pega primeiro a tarefa de maior valor. No exemplo pronto, o guloso fica com 29 e a PD com 33.
+5. Em **PD × guloso**, o resultado da PD aparece ao lado do guloso que pega primeiro a tarefa de maior valor. No exemplo das lives, o guloso fica com 29 e a PD com 33.
 
 Entradas inválidas (fim antes do início, valor negativo, campo vazio, arquivo com erro) aparecem como mensagens logo abaixo do formulário ou dos botões de arquivo, sem apagar o que já estava na lista.
+
+## Exemplos
+
+Ficam em `exemplos/` e aparecem no seletor da interface (a lista vem de `exemplos/indice.json`). Todos podem ser abertos também pelo **Importar arquivo**.
+
+| Arquivo | O que é | PD | Guloso |
+|---|---|---|---|
+| `lives-streamer.json` | 7 lives de um streamer; valor = audiência esperada (mil) | 33 | 29 |
+| `freelancer.json` | 11 trabalhos avulsos; valor = pagamento (R$) | 1.100 | 1.060 |
+| `pequeno-a-mao.json` | 6 tarefas (A a F) para montar a tabela no quadro: `M = 0, 4, 7, 7, 12, 12, 15` | 15 | 10 |
+| `guloso-falha.json` | uma live longa (10) contra quatro curtas (3 cada) no mesmo horário | 12 | 10 |
+| `grande-1000.json` | 1000 tarefas aleatórias, para mostrar que roda rápido | 2.996 | 1.614 |
+
+O exemplo grande é gerado com semente fixa por `npm run gerar-exemplo-grande`; os testes conferem que o arquivo versionado é igual ao que o script produz. Depois de otimizar, a tela mostra quanto tempo o cálculo levou.
 
 ## Testes
 
@@ -69,6 +83,7 @@ src/estilo.css        estilos
 exemplos/             agendas prontas para carregar na interface
 tests/                testes automatizados (node --test)
 scripts/servidor.js   servidor local para o `npm start`
+scripts/gerar-exemplo-grande.js   gera exemplos/grande-1000.json (semente fixa)
 ```
 
 ## Algoritmo

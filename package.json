@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node scripts/servidor.js",
-    "test": "node --test"
+    "test": "node --test",
+    "gerar-exemplo-grande": "node scripts/gerar-exemplo-grande.js"
   },
   "engines": {
     "node": ">=20"

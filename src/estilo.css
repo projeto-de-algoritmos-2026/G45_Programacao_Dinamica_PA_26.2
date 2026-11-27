@@ -131,6 +131,7 @@ input {
 }
 
 input:focus-visible,
+select:focus-visible,
 button:focus-visible,
 .botao:focus-within {
   outline: 2px solid var(--destaque);
@@ -147,6 +148,28 @@ button:focus-visible,
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.exemplos {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+
+select {
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 8px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  background: var(--fundo);
+  color: var(--texto);
+  max-width: 100%;
+}
+
+#descricao-exemplo {
+  margin: 12px 0 0;
 }
 
 .barra {
