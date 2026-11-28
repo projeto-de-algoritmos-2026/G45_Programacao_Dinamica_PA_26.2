@@ -1,6 +1,6 @@
 {
-  "nome": "Exemplo pequeno: dia de um streamer",
-  "descricao": "Sete lives com horário e audiência esperada (em milhares). Pegar só a de maior audiência não é o melhor: a PD acha uma combinação que rende mais.",
+  "nome": "Agenda de lives de um streamer",
+  "descricao": "Sete lives com horário e audiência esperada (em milhares). Pegar primeiro as de maior audiência não é o melhor: o guloso fica com 29 e a PD acha uma combinação que rende 33.",
   "tarefas": [
     { "nome": "Café com o chat", "inicio": "08:00", "fim": "09:30", "valor": 3 },
     { "nome": "Gameplay da manhã", "inicio": "09:00", "fim": "12:00", "valor": 8 },

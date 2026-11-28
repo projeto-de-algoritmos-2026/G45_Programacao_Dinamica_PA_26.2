@@ -1,0 +1,7 @@
+[
+  { "arquivo": "lives-streamer.json", "nome": "Agenda de lives de um streamer" },
+  { "arquivo": "freelancer.json", "nome": "Tarefas de um freelancer" },
+  { "arquivo": "pequeno-a-mao.json", "nome": "Pequeno, para calcular à mão" },
+  { "arquivo": "guloso-falha.json", "nome": "O guloso falha" },
+  { "arquivo": "grande-1000.json", "nome": "Grande: 1000 tarefas aleatórias" }
+]

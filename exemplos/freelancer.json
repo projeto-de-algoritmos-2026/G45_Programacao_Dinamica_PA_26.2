@@ -1,0 +1,17 @@
+{
+  "nome": "Tarefas de um freelancer",
+  "descricao": "Um dia de trabalhos avulsos; o valor é o pagamento de cada um, em reais. Dá para fazer um trabalho por vez. A PD fatura R$ 1.100; o guloso, que pega primeiro o mais bem pago, fica com R$ 1.060.",
+  "tarefas": [
+    { "nome": "Logo para padaria", "inicio": "08:00", "fim": "10:00", "valor": 120 },
+    { "nome": "Reunião com cliente", "inicio": "09:00", "fim": "10:30", "valor": 80 },
+    { "nome": "Site institucional", "inicio": "10:00", "fim": "13:00", "valor": 300 },
+    { "nome": "Revisão de texto", "inicio": "10:30", "fim": "12:00", "valor": 90 },
+    { "nome": "Posts para redes sociais", "inicio": "12:00", "fim": "13:30", "valor": 70 },
+    { "nome": "Aula particular", "inicio": "13:00", "fim": "15:00", "valor": 150 },
+    { "nome": "Correção de bug urgente", "inicio": "13:30", "fim": "14:30", "valor": 200 },
+    { "nome": "Edição de vídeo", "inicio": "14:30", "fim": "18:00", "valor": 280 },
+    { "nome": "Consultoria", "inicio": "15:00", "fim": "17:00", "valor": 220 },
+    { "nome": "Relatório mensal", "inicio": "17:00", "fim": "18:30", "valor": 100 },
+    { "nome": "Mentoria", "inicio": "19:00", "fim": "21:00", "valor": 160 }
+  ]
+}

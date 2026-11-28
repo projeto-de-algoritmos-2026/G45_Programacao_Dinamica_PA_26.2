@@ -41,15 +41,21 @@
       </form>
 
       <div class="acoes barra">
-        <button type="button" id="botao-exemplo">Carregar exemplo</button>
+        <span class="exemplos">
+          <select id="exemplo" aria-label="Exemplo pronto">
+            <option value="">Carregando exemplos…</option>
+          </select>
+          <button type="button" id="botao-exemplo" disabled>Carregar exemplo</button>
+        </span>
         <label class="botao">Importar arquivo (.json ou .csv)
           <input type="file" id="arquivo" accept=".json,.csv,application/json,text/csv" hidden>
         </label>
         <button type="button" id="botao-limpar">Limpar tudo</button>
       </div>
       <ul id="erros-arquivo" class="erros" role="alert" hidden></ul>
+      <p id="descricao-exemplo" class="dica" hidden></p>
 
-      <p id="sem-tarefas" class="vazio">Nenhuma tarefa ainda. Adicione uma acima, carregue o exemplo ou importe um arquivo.</p>
+      <p id="sem-tarefas" class="vazio">Nenhuma tarefa ainda. Adicione uma acima, carregue um exemplo ou importe um arquivo.</p>
       <table id="tabela-tarefas" hidden>
         <thead>
           <tr><th>Nome</th><th>Início</th><th>Fim</th><th class="numero">Valor</th><th><span class="sr-only">Ações</span></th></tr>

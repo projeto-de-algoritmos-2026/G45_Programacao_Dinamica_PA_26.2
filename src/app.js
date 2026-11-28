@@ -6,7 +6,7 @@ import { formatarValor, linhasDaTabela, roteiro } from './explicacao.js';
 import { ErroDeValidacao, Tarefa, minutosParaHorario } from './tarefa.js';
 import { desenharComparacao, desenharLinhaDoTempo, desenharTabelaPD } from './visualizacao.js';
 
-const EXEMPLO = 'exemplos/exemplo-pequeno.json';
+const PASTA_EXEMPLOS = 'exemplos/';
 // Acima disso, a linha do tempo e a tabela ficariam enormes; o resultado e a comparação continuam aparecendo.
 const LIMITE_VISUALIZACAO = 60;
 const INTERVALO_REPRODUCAO = 1600; // ms entre etapas no modo "Reproduzir"
@@ -15,6 +15,7 @@ const estado = {
   tarefas: [],
   editando: null, // índice da tarefa em edição, ou null
   resultado: null,
+  tempoMs: 0, // quanto o agendar levou na última otimização
   desatualizado: false,
   linhas: [], // linhas da tabela da PD do último resultado
   roteiro: [], // etapas do passo a passo do último resultado
@@ -78,12 +79,15 @@ function tarefasMudaram() {
   renderizar();
 }
 
-function substituirTarefas(tarefas) {
+// Troca a lista inteira (exemplo, arquivo importado ou "Limpar tudo"); `descricao` é a do exemplo carregado.
+function substituirTarefas(tarefas, descricao = '') {
   pararReproducao();
   sairDaEdicao();
   estado.tarefas = tarefas;
   estado.resultado = null;
   estado.desatualizado = false;
+  $('#descricao-exemplo').textContent = descricao;
+  $('#descricao-exemplo').hidden = !descricao;
   renderizar();
 }
 
@@ -149,7 +153,11 @@ function renderizarResultado() {
   $('#valor-total').textContent = formatarValor(r.valorMaximo);
   $('#resumo').textContent =
     `${r.escolhidas.length} de ${r.tarefas.length} tarefa(s) escolhida(s). ` +
-    'Nenhuma outra combinação sem sobreposição soma mais.';
+    'Nenhuma outra combinação sem sobreposição soma mais. ' +
+    // O navegador arredonda o relógio (~0,1 ms), então tempos menores aparecem como "menos de 0,1 ms".
+    (estado.tempoMs < 0.1
+      ? 'Calculado em menos de 0,1 ms.'
+      : `Calculado em ${estado.tempoMs.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} ms.`);
   $('#lista-escolhidas').replaceChildren(...r.escolhidas.map(itemTarefa));
   $('#lista-descartadas').replaceChildren(
     ...(descartadas.length > 0 ? descartadas.map(itemTarefa) : [criar('li', 'Nenhuma: todas couberam na agenda.', 'vazio')]),
@@ -232,12 +240,38 @@ $('#botao-cancelar').addEventListener('click', () => {
   renderizar();
 });
 
+async function buscarTexto(caminho) {
+  const resposta = await fetch(caminho);
+  if (!resposta.ok) throw new Error(`Não foi possível carregar "${caminho}" (${resposta.status}).`);
+  return resposta.text();
+}
+
+// Preenche o seletor com os exemplos de exemplos/indice.json.
+async function carregarIndiceDeExemplos() {
+  const seletor = $('#exemplo');
+  try {
+    const indice = JSON.parse(await buscarTexto(`${PASTA_EXEMPLOS}indice.json`));
+    seletor.replaceChildren(
+      ...indice.map(({ arquivo, nome }) => {
+        const opcao = criar('option', nome);
+        opcao.value = arquivo;
+        return opcao;
+      }),
+    );
+    $('#botao-exemplo').disabled = false;
+  } catch (erro) {
+    seletor.replaceChildren(criar('option', 'Exemplos indisponíveis'));
+    mostrarErros($('#erros-arquivo'), mensagensDe(erro));
+  }
+}
+
 $('#botao-exemplo').addEventListener('click', async () => {
   mostrarErros($('#erros-arquivo'), []);
   try {
-    const resposta = await fetch(EXEMPLO);
-    if (!resposta.ok) throw new Error(`Não foi possível carregar o exemplo (${resposta.status}).`);
-    substituirTarefas(lerJSON(await resposta.text()));
+    const texto = await buscarTexto(PASTA_EXEMPLOS + $('#exemplo').value);
+    const tarefas = lerJSON(texto);
+    const { nome, descricao } = JSON.parse(texto);
+    substituirTarefas(tarefas, `${nome}: ${descricao}`);
   } catch (erro) {
     mostrarErros($('#erros-arquivo'), mensagensDe(erro));
   }
@@ -262,7 +296,9 @@ $('#botao-limpar').addEventListener('click', () => {
 
 $('#botao-otimizar').addEventListener('click', () => {
   pararReproducao();
+  const inicio = performance.now();
   estado.resultado = agendar(estado.tarefas);
+  estado.tempoMs = performance.now() - inicio;
   estado.linhas = linhasDaTabela(estado.resultado);
   estado.roteiro = roteiro(estado.resultado);
   estado.guloso = gulosoPorValor(estado.tarefas);
@@ -312,3 +348,4 @@ $('#passo-play').addEventListener('click', () => {
 });
 
 renderizar();
+carregarIndiceDeExemplos();
